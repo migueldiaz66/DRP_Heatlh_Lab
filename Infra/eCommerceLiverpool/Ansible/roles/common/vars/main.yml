@@ -1,0 +1,8 @@
+---
+packages:
+  - libselinux-python        # for Ansible
+  - python2                  # for Ansible
+  - python-simplejson        # for Ansible
+  - unzip                    # for Ansibe (file module)
+  # - fswatch                  # for monitoring file changes
+  

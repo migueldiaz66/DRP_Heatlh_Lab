@@ -1,0 +1,59 @@
+hosts = YAML.load_file('../Inventory/hosts.yml')
+
+#hostname = ""
+#ip = ""
+
+i = 1
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "ol68" #wls_admin_server_name
+  config.vm.box_url = "https://yum.oracle.com/boxes/oraclelinux/ol68/ol68.box"
+
+  hosts.each do |v|
+    
+    config.vm.define v["name"] do |machine|
+
+      machine.vm.network "private_network", ip: v["ip"]
+      
+      machine.vm.provider "virtualbox" do |vb|
+      
+        vb.name = v["name"] 
+
+        if v.has_key?('synced_folders')
+          
+          folders = v['synced_folders']
+          
+          folders.each do |folder|
+
+            machine.vm.synced_folder folder['src'], folder['dest'], folder['options']
+
+          end
+
+        end
+    
+      end
+
+      if i == hosts.count
+
+          config.vm.provision :ansible do |ansible|
+
+             ansible.limit = "all"
+             ansible.playbook = "../Ansible/main.yml"
+             ansible.sudo = true
+             ansible.config_file = "/etc/ansible/ansible.cfg"
+
+        end
+   
+      end
+
+      i = i + 1
+      
+    end
+
+  end
+        
+end
+
+
+

@@ -1,0 +1,10 @@
+---
+- hosts: all
+  gather_facts: true
+  
+  roles:
+  - common
+  - oracle_server_jdk8
+  - oracle_weblogic_12_2_1_3
+  
+  

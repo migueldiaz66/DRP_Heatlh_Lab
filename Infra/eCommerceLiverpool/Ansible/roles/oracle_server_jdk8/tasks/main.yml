@@ -1,0 +1,22 @@
+---
+- name: Create the Oracle JDK Server 8 ORACLE_HOME path (/usr/java/)
+  file: 
+    path: /usr/java/
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: 0775
+
+- name: Unpack Oracle JDK Server 8 into ORACLE_HOME
+  unarchive:
+    src: server-jre-8u181-linux-x64.tar.gz
+    dest: /usr/java
+
+- name: Set java, javac and jar into the system path
+  shell: export JAVA_DIR=$(ls -1 -d /usr/java/*) && \
+         ln -s $JAVA_DIR /usr/java/latest && \
+         ln -s $JAVA_DIR /usr/java/default && \
+         alternatives --install /usr/bin/java java $JAVA_DIR/bin/java 20000 && \
+         alternatives --install /usr/bin/javac javac $JAVA_DIR/bin/javac 20000 && \
+         alternatives --install /usr/bin/jar jar $JAVA_DIR/bin/jar 20000
+  

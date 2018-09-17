@@ -1,0 +1,10 @@
+---
+- name: ensure a list of packages installed      
+  yum: 
+    name: "{{ packages }}"
+  register: packages_out 
+
+- name: Debug ensure a list of packages installed 
+  debug:
+   msg: "{{packages_out}}"
+

@@ -1,0 +1,7 @@
+/Infra/eCommerceLiverpool/SyncFolder/
+.vagrant/*
+/Infra/eCommerceLiverpool/Vagrant/.vagrant/
+*.zip
+*.tar.gz
+*.retry
+*.download
