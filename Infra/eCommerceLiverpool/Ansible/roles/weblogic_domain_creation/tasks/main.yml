@@ -1,0 +1,107 @@
+- name: Validate if domain already exits
+  stat:
+    path: '{{DOMAIN_HOME}}'
+  register: domain_exists
+
+- name:  Already exists Domain?
+  debug: msg='{{ domain_exists }}'
+
+- name: Stop the AdminServer
+  shell: '{{DOMAIN_HOME}}/bin/stopWebLogic.sh &'
+  register: stop_admin_res
+  when: domain_exists.stat.exists == true
+
+- name:  was domain stopped?
+  debug: msg='{{ stop_admin_res }}'
+
+
+- name: Validate if  AdminServer is Down
+  wait_for:
+    host: '{{inventory_hostname}}'
+    port: 7001
+    delay: 10
+    state: stopped
+  register: adminserver_stopped
+  when: domain_exists.stat.exists == true
+
+
+- name: Print adminserver stopped result  
+  debug: msg="{{adminserver_stopped}}"
+  when: domain_exists.stat.exists == true
+
+
+- name: Delete Doimain
+  shell: 'rm -Rf {{DOMAIN_HOME}}/*'
+  when: domain_exists.stat.exists == true
+
+- name: Oracle WebLogic Domain setup
+  shell: wlst.sh -skipWLSModuleScanning -loadProperties {{DOMAIN_PROPERTIES}} {{CREATE_DOMAIN_WLST_SCRIPT}}
+  args:
+    chdir: /u01
+  environment:
+    USER_MEM_ARGS: '"{{USER_MEM_ARGS}}"'
+    PATH: "{{ansible_env.PATH }}:{{ORACLE_COMMON_BIN}}:{{WEBLOGIC_COMMON_BIN}}"
+    DOMAIN_NAME: '{{DOMAIN_NAME}}'
+    ADMIN_NAME: '{{ADMIN_NAME}}'
+    ADMIN_PORT: '{{ADMIN_PORT}}'
+    ADMIN_PASSWORD: '{{ADMIN_PASSWORD}}'
+    CLUSTER_NAME: '{{CLUSTER_NAME}}'
+    DOMAIN_PATH: '{{DOMAIN_PATH}}'
+    PRODUCTION_MODE: '{{PRODUCTION_MODE}}'
+  become: true
+  become_user: vagrant
+  register: eco
+
+- name: path
+  debug: msg=" {{ eco }}"
+
+- name: Add user and password to boot.properties
+  shell: 'mkdir -p {{DOMAIN_HOME}}/servers/AdminServer/security/ && \ 
+          echo "username=weblogic" >> {{DOMAIN_HOME}}/servers/AdminServer/security/boot.properties && \
+          echo "password={{ADMIN_PASSWORD}}" >> {{DOMAIN_HOME}}/servers/AdminServer/security/boot.properties &&  \
+          {{DOMAIN_HOME}}/bin/setDomainEnv.sh'
+  register: boot_proprties_res
+
+- name:  Boot_properties result
+  debug: msg='{{ boot_proprties_res }}'
+
+- name: start the AdminServer
+  shell: nohup {{DOMAIN_HOME}}/startWebLogic.sh &
+  register: start_admin_res
+  #async: 1000
+  #poll: 0
+
+#- name: 'start the AdminServer - check on async task {{ start_admin_res.ansible_job_id }}'
+#  async_status:
+#    jid: "{{ start_admin_res.ansible_job_id }}"
+#  register: start_admin_res
+#  until: start_admin_res.finished
+#  retries: 30
+
+- name:  start_admin result
+  debug: msg='{{ start_admin_res }}'
+
+- name: Validate if  AdminServer is up
+  wait_for:
+    host: '{{inventory_hostname}}'
+    port: 7001
+    delay: 100
+    state: started
+    timeout: 6000
+  register: adminserver_started
+  async: 1000
+  poll: 0
+
+- name: 'start the AdminServer - check on async task {{ start_admin_res.ansible_job_id }}'
+  async_status:
+    jid: "{{ adminserver_started.ansible_job_id }}"
+  register: start_admin_res
+  until: start_admin_res.finished
+  retries: 60000
+
+- name: Print adminserver started result  
+  debug: msg="{{adminserver_started}}"
+     
+
+  
+  

@@ -14,7 +14,7 @@
 domain_name      = os.environ.get("DOMAIN_NAME", "base_domain")
 admin_name       = os.environ.get("ADMIN_NAME", "AdminServer")
 admin_port       = int(os.environ.get("ADMIN_PORT", "7001"))
-admin_pass       = "ADMIN_PASSWORD"
+admin_pass       = "Password@1"
 cluster_name     = os.environ.get("CLUSTER_NAME", "DockerCluster")
 domain_path      = '/u01/oracle/user_projects/domains/%s' % domain_name
 production_mode  = os.environ.get("PRODUCTION_MODE", "prod")
@@ -66,7 +66,7 @@ set('LogLevel', 'FINEST')
 # Set the Node Manager user name and password (domain name will change after writeDomain)
 cd('/SecurityConfiguration/base_domain')
 set('NodeManagerUsername', 'weblogic')
-set('NodeManagerPasswordEncrypted', admin_pass)
+set('NodeManagerPasswordEncrypted', 'Password@1')
 
 # Define a WebLogic Cluster
 # =========================

@@ -10,11 +10,12 @@ import socket
 # =========
 # Environment Vars
 hostname       = socket.gethostname()
+
 # Admin Vars
 admin_name     = os.environ.get('ADMIN_NAME', 'AdminServer')
 admin_username = os.environ.get('ADMIN_USERNAME', 'weblogic')
-admin_password = "ADMIN_PASSWORD"
-admin_host     = os.environ.get('ADMIN_HOST', 'wlsadmin')
+admin_password = "Password@1"
+admin_host     = os.environ.get('ADMIN_HOST', {{AdminServer}})
 admin_port     = os.environ.get('ADMIN_PORT', '7001')
 
 # Node Manager Vars

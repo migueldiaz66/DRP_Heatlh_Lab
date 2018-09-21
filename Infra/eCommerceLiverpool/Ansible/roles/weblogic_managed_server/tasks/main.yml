@@ -1,0 +1,103 @@
+- name: "Print default variables"
+  debug: 
+    msg:
+      - 'Default Variables :'
+      - ""
+      - 'DOMAIN_NAME: {{DOMAIN_NAME}}'
+      - 'DOMAIN_HOME: {{DOMAIN_HOME}}' 
+      - 'MS_NAME: {{MS_NAME}}'
+      - 'NM_NAME: {{NM_NAME}}'
+      - 'ADMIN_PASSWORD: {{ADMIN_PASSWORD}}'
+      - 'NM_DIR: {{NM_DIR}}'
+      - 'NODEMGR_HOME_STR: {{NODEMGR_HOME_STR}}'
+      - 'DOMAINSFILE_STR: {{DOMAINSFILE_STR}}'
+      - 'NODEMGRHOME_STR: {{NODEMGRHOME_STR}}'
+      - 'LOGFILE_STR: {{LOGFILE_STR}}'
+
+#- name: 'Validate if AdminServer is up'
+#  wait_for:
+#    host: '{{AdminServer}}'
+#    port: 7001
+#    delay: 5
+#    state: started
+#    timeout: 600
+#  register: adminserver_started
+ 
+
+#- name: 'Validate if node manager already exits ({{NM_DIR}}/logs/log_{{MS_NAME}}.nm)'
+#  stat:
+#    path: '{{NM_DIR}}/logs/log_{{MS_NAME}}.nm'
+#  register: NM_exists
+
+#- debug: msg="{{NM_exists}}"
+
+#- name: Delete the node manager {{NM_DIR}}
+#  shell: 'rm -Rf {{NM_DIR}}/*'
+ # when: NM_exists.stat.exists == true
+
+#- name: Create the node  dir {{NM_DIR}}
+#  shell: 'mkdir -p {{NM_DIR}}'
+
+#- name: Copy node manager files to node
+#  shell: 'cp {{DOMAIN_HOME}}/bin/startNodeManager.sh {{NM_DIR}} && cp -r {{DOMAIN_HOME}}/nodemanager/* {{NM_DIR}} '
+
+#- name: Configure node manager shell file & propreties file for this node
+#  shell: 'sed -i -e "s|NODEMGR_HOME\=.*$|{{NODEMGR_HOME_STR}}|g" {{NM_DIR}}/startNodeManager.sh && sed -i -e "s|DomainsFile\=.*$|{{DOMAINSFILE_STR}}|g" {{NM_DIR}}/nodemanager.properties && sed -i -e "s|NodeManagerHome\=.*$|[{{NODEMGRHOME_STR}}|g" {{NM_DIR}}/nodemanager.properties && sed -i -e "s|LogFile=$|$LOGFILE_STR|g" {{NM_DIR}}/nodemanager.properties'
+
+#- name: Creates de logs dir
+#  shell: 'mkdir -p {{NM_DIR}}/logs/'
+
+#- name: Start the node manager on this host 
+#  shell: 'nohup {{NM_DIR}}/startNodeManager.sh > {{NM_DIR}}/logs/log_{{MS_NAME}}.nm 2>&1 &'
+#  register: nm_start 
+  
+#- name: print start
+#  debug: msg={{nm_start}}
+
+#- name: Copy srcipts for Oracle WebLogic Managed Server creation
+#  copy: 
+#    src={{ item.0 }} 
+#    dest={{ item.1 }}
+#    mode={{ item.2 }}
+#  with_together:
+#    - [ 'add-machine.py',
+#        'add-server.py'  
+#      ]
+#    - [ '/u01/files/', 
+#        '/u01/files/'
+#      ]
+#    - [ 'u+rwx,g+rwx,o+rwx', 
+#        'u+rwx,g+rwx,o+rwx'
+#      ]
+
+- name: Generate commonfuncs.py
+  template:
+    src=commonfuncs.j2
+    dest={{NM_DIR}}/commonfuncs.py
+
+- name: Generate add-machine.py
+  template:
+    src=add-machine.j2
+    dest={{NM_DIR}}/add-machine.py
+
+- name: Generate add-server.py
+  template:
+    src=add-server.j2
+    dest={{NM_DIR}}/add-server.py
+
+
+#- name: Run the Machine Creation WLST Script  
+#  shell: wlst.sh -skipWLSModuleScanning {{NM_DIR}}/add-machine.py
+#  environment:
+#    USER_MEM_ARGS: "-Djava.security.egd=file:/dev/./urandom"
+#    PATH: "{{ ansible_env.PATH }}:/u01/oracle/oracle_common/common/bin:/u01/oracle/wlserver/common/bin"
+#  register: Machine_Creation_WLST_Script
+
+- name: Run the Server Creation WLST Script  
+  shell: wlst.sh -skipWLSModuleScanning {{NM_DIR}}/add-server.py
+  environment:
+    USER_MEM_ARGS: "-Djava.security.egd=file:/dev/./urandom"
+    PATH: "{{ ansible_env.PATH }}:/u01/oracle/oracle_common/common/bin:/u01/oracle/wlserver/common/bin"
+  register: Server_Creation_WLST_Script
+
+

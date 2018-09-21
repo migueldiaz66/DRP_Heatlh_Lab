@@ -14,7 +14,7 @@ admin_name  = os.environ.get("ADMIN_NAME", "AdminServer")
 admin_listen_port   = int(os.environ.get("ADMIN_LISTEN_PORT", "7001"))
 domain_path  = '/u01/oracle/user_projects/domains/%s' % domain_name
 production_mode = os.environ.get("PRODUCTION_MODE", "prod")
-administration_port_enabled = os.environ.get("ADMINISTRATION_PORT_ENABLED", "true")
+administration_port_enabled = os.environ.get("ADMINISTRATION_PORT_ENABLED", "false")
 administration_port = int(os.environ.get("ADMINISTRATION_PORT", "9002"))
 
 print('domain_name                 : [%s]' % domain_name);
@@ -56,7 +56,7 @@ if administration_port_enabled != "false":
 # Define the user password for weblogic
 # =====================================
 cd('/Security/%s/User/weblogic' % domain_name)
-cmo.setPassword('Password=1')
+cmo.setPassword('Password@1')
 
 # Write the domain and close the domain template
 # ==============================================

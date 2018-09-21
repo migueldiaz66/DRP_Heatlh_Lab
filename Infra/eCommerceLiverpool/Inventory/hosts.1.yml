@@ -1,0 +1,10 @@
+- name: Store01-eCommerce-liverpool-Prd
+  ip: 192.168.1.101
+  synced_folders:
+    - src: ../SyncFolder/Prd/u01/
+      dest: /u01/
+      options:
+        create: true
+        owner: oracle
+        group: oracle
+        mount_options: ['dmode=0777', 'fmode=0777']

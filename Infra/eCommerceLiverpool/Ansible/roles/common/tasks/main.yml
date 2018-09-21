@@ -1,10 +1,29 @@
 ---
-- name: ensure a list of packages installed      
+- name: Make sure a list of packages is installed      
   yum: 
     name: "{{ packages }}"
   register: packages_out 
 
-- name: Debug ensure a list of packages installed 
+- name: Prints the list of packages installed 
   debug:
    msg: "{{packages_out}}"
+
+- name: Permanently sets the hostname
+  hostname:
+    name: '{{inventory_hostname}}'
+  register: set_host_name_result
+
+- name: Prints the result of permanently setting the hostname
+  debug:
+   msg: "{{set_host_name_result}}"
+
+- name: Generates the /etc/hosts file
+  template:
+    src=hosts.j2
+    dest=/etc/hosts
+  register: set_hosts_file_result
+
+- name: Prints the result of generating the /etc/hosts file
+  debug:
+   msg: "{{set_hosts_file_result}}"
 

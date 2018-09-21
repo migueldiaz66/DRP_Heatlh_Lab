@@ -1,0 +1,12 @@
+  # convert "ansible" to "able"
+  - name: x
+    debug: 
+      msg: "{{ hostvars[groups['Stores-Prd'][0]]['AdminServer'] }}"
+
+  - name: ya
+    debug: 
+      msg: "{{AdminServer}}"
+
+    # 
+   # hostvars[groups['webservers'][0]]['foo']
+      
