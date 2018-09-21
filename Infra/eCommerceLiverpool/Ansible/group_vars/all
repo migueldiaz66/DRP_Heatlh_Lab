@@ -13,7 +13,7 @@ DOMAIN_PATH:               '{{DOMAIN_HOME}}'
 PRODUCTION_MODE:           prod
 
 MS_NAME: '{{inventory_hostname}}'
-NM_NAME: 'M_{{MS_NAME}}'
+NM_NAME: '{{MS_NAME}}'
 NM_DIR: '{{DOMAIN_HOME}}/{{NM_NAME}}'
 DOMAINSFILE_STR: DomainsFile={{NM_DIR}}/nodemanager.domains
 NODEMGRHOME_STR: NodeManagerHome={{NM_DIR}}
