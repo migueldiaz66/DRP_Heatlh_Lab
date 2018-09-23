@@ -1,0 +1,30 @@
+- name: "AdminServers-Prd"
+  elements:
+    - AdminServer-eCommerce-liverpool-Prd
+- name: "AdminServers-Drp"
+  elements:
+    - AdminServer-eCommerce-liverpool-Drd
+- name: "Stores-Prd"
+  elements:
+    - Store01-eCommerce-liverpool-Prd
+    - Store02-eCommerce-liverpool-Prd
+    - Store03-eCommerce-liverpool-Prd
+- name: "Stores-Drp"
+  elements:
+    - Store01-eCommerce-liverpool-Drp
+    - Store02-eCommerce-liverpool-Drp
+    - Store03-eCommerce-liverpool-Drp
+- name: "AdmimServers:children"
+  elements:
+    - AdminServers-Drp
+    - AdminServers-Prd
+- name: "Stores:children"
+  elements:
+    - Stores-Drp
+    - Stores-Prd
+- name: "Stores-Prd:vars"
+  elements:
+    - AdminServer=AdminServer-eCommerce-liverpool-Prd
+- name: "Stores-Drp:vars"
+  elements:
+    - AdminServer=AdminServer-eCommerce-liverpool-Drp

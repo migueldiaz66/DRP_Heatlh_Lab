@@ -1,11 +1,61 @@
 hosts = YAML.load_file('../Inventory/hosts.yml')
+groups = YAML.load_file('../Inventory/groups.yml')
 
-#hostname = ""
-#ip = ""
+ga = Hash.new {|h,k| h[k]=[]}
+ga1 = Hash.new {|h,k| h[k]=[]}
 
 i = 1
 
+ANSIBLE_GROUPS = {
+                "AdminServers-Prd" => ["AdminServer-eCommerce-liverpool-Prd"],
+                "AdminServers-Drp" => ["AdminServer-eCommerce-liverpool-Drp"],
+                "Stores-Prd" => ["Store01-eCommerce-liverpool-Prd","Store02-eCommerce-liverpool-Prd","Store03-eCommerce-liverpool-Prd"],
+                "Stores-Drp" => ["Store01-eCommerce-liverpool-Drp","Store02-eCommerce-liverpool-Drp","Store03-eCommerce-liverpool-Drp"],
+                "Stores-Prd:vars" => ["AdminServer=AdminServer-eCommerce-liverpool-Prd"],
+                "Stores-Drp:vars" => ["AdminServer=AdminServer-eCommerce-liverpool-Drp"],
+                "AdminServers:children" => ["AdminServers-Prd","AdminServers-Drp"],
+                "Stores:children" => ["Stores-Prd","Stores-Drp"]                
+              } 
+
+
+hosts.each do |va|
+  len = va["ansible_inventory"]["groups"]["belongs_to"].length
+  for j in 0..len -1
+    if  ! (ga.has_key?(ga[va["ansible_inventory"]["groups"]["belongs_to"][j]]))
+       ga[va["ansible_inventory"]["groups"]["belongs_to"][j]] 
+    end 
+  end  
+end
+
+hosts.each do |va|
+  name = va["name"]
+  len = va["ansible_inventory"]["groups"]["belongs_to"].length
+  for k in 0..len -1
+    if ! (ga.has_key?(ga[va["ansible_inventory"]["groups"]["belongs_to"][k]]))
+       ga[va["ansible_inventory"]["groups"]["belongs_to"][k]] << name
+    end 
+  end  
+end
+
+groups.each do |va|
+  len = va["elements"].length
+  for l in 0..len -1
+    ga1[va["name"]] << va["elements"][l]
+  end  
+end
+
+ga2 = ga.merge(ga1)
+
+puts ga
+puts ga1
+puts ga2
+
+
+
+
 Vagrant.configure(2) do |config|
+
+
 
   config.vm.box = "ol68" #wls_admin_server_name
   config.vm.box_url = "https://yum.oracle.com/boxes/oraclelinux/ol68/ol68.box"
@@ -42,16 +92,8 @@ Vagrant.configure(2) do |config|
              ansible.playbook = "../Ansible/main.1.yml"
              ansible.sudo = true
              ansible.config_file = "/etc/ansible/ansible.cfg"
-             ansible.groups = {
-               "AdminServers-Prd" => ["AdminServer-eCommerce-liverpool-Prd"],
-               "AdminServers-Drp" => ["AdminServer-eCommerce-liverpool-Drp"],
-               "Stores-Prd" => ["Store01-eCommerce-liverpool-Prd","Store02-eCommerce-liverpool-Prd","Store03-eCommerce-liverpool-Prd"],
-               "Stores-Drp" => ["Store01-eCommerce-liverpool-Drp","Store02-eCommerce-liverpool-Drp","Store03-eCommerce-liverpool-Drp"],
-               "Stores-Prd:vars" => ["AdminServer=AdminServer-eCommerce-liverpool-Prd"],
-               "Stores-Drp:vars" => ["AdminServer=AdminServer-eCommerce-liverpool-Drp"],
-               "AdminServers:children" => ["AdminServers-Prd","AdminServers-Drp"],
-               "Stores:children" => ["Stores-Prd","Stores-Drp"]
-             }
+             #ansible.groups = ANSIBLE_GROUPS
+             ansible.groups = ga2
 
         end
    
