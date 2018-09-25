@@ -12,6 +12,7 @@
       - 'NODEMGR_HOME_STR: {{NODEMGR_HOME_STR}}'
       - 'DOMAINSFILE_STR: {{DOMAINSFILE_STR}}'
       - 'NODEMGRHOME_STR: {{NODEMGRHOME_STR}}'
+      
       - 'LOGFILE_STR: {{LOGFILE_STR}}'
 
 - name: 'Validate if AdminServer is up'

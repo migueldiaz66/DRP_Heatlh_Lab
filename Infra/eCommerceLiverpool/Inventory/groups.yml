@@ -14,7 +14,7 @@
     - Store01-eCommerce-liverpool-Drp
     - Store02-eCommerce-liverpool-Drp
     - Store03-eCommerce-liverpool-Drp
-- name: "AdmimServers:children"
+- name: "AdminServers:children"
   elements:
     - AdminServers-Drp
     - AdminServers-Prd
