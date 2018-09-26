@@ -3,17 +3,31 @@
     msg:
       - 'Default Variables :'
       - ""
-      - 'DOMAIN_NAME: {{DOMAIN_NAME}}'
-      - 'DOMAIN_HOME: {{DOMAIN_HOME}}' 
-      - 'MS_NAME: {{MS_NAME}}'
-      - 'NM_NAME: {{NM_NAME}}'
-      - 'ADMIN_PASSWORD: {{ADMIN_PASSWORD}}'
-      - 'NM_DIR: {{NM_DIR}}'
       - 'NODEMGR_HOME_STR: {{NODEMGR_HOME_STR}}'
       - 'DOMAINSFILE_STR: {{DOMAINSFILE_STR}}'
       - 'NODEMGRHOME_STR: {{NODEMGRHOME_STR}}'
-      
       - 'LOGFILE_STR: {{LOGFILE_STR}}'
+      - 'USER_MEM_ARGS: {USER_MEM_ARGS}}'
+      - 'PATH: {{ansible_env.PATH }}:{{ORACLE_COMMON_BIN}}:{{WEBLOGIC_COMMON_BIN}}'
+      - 'DOMAIN_NAME: {{DOMAIN_NAME}}'
+      - 'ADMIN_NAME: {{ADMIN_NAME}}'
+      - 'ADMIN_PORT: {{ADMIN_PORT}}'
+      - 'ADMIN_PASSWORD: {{ADMIN_PASSWORD}}'
+      - 'CLUSTER_NAME: {{CLUSTER_NAME}}'
+      - 'DOMAIN_PATH: {{DOMAIN_PATH}}'
+      - 'PRODUCTION_MODE: {{PRODUCTION_MODE}}'
+      - 'ADMIN_HOST: {{AdminServer}}'
+      - 'NM_NAME: {{NM_NAME}}'
+      - 'NM_HOST: {{NM_HOST}}'
+      - 'NM_PORT: {{NM_PORT}}'
+      - 'MS_PORT: {{MS_PORT}}'
+      - 'NM_DIR: {{DOMAIN_HOME}}/{{NM_NAME}}'
+      - 'DOMAINSFILE_STR: DomainsFile={{NM_DIR}}/nodemanager.domains'
+      - 'NODEMGRHOME_STR: NodeManagerHome={{NM_DIR}}'
+      - 'LOGFILE_STR: LogFile={{NM_DIR}}/nodemanager.log'
+      - 'NODEMGR_HOME_STR: NODEMGR_HOME="{{NM_DIR}}'
+      - 'commonfuncs_py:{{commonfuncs_py}}'
+
 
 - name: 'Validate if AdminServer is up'
   wait_for:
@@ -24,7 +38,6 @@
     timeout: 600
   register: adminserver_started
  
-
 - name: 'Validate if node manager already exits ({{NM_DIR}}/logs/log_{{MS_NAME}}.nm)'
   stat:
     path: '{{NM_DIR}}/logs/log_{{MS_NAME}}.nm'
@@ -55,50 +68,90 @@
 - name: print start
   debug: msg={{nm_start}}
 
-- name: Copy srcipts for Oracle WebLogic Managed Server creation
-  copy: 
-    src={{ item.0 }} 
-    dest={{ item.1 }}
-    mode={{ item.2 }}
-  with_together:
-    - [ 'add-machine.py',
-        'add-server.py'  
-      ]
-    - [ '/u01/files/', 
-        '/u01/files/'
-      ]
-    - [ 'u+rwx,g+rwx,o+rwx', 
-        'u+rwx,g+rwx,o+rwx'
-      ]
+#- name: Copy srcipts for Oracle WebLogic Managed Server creation
+#  copy: 
+#    src: '{{ item.0 }}' 
+#    dest: '{{ item.1 }}'
+#   mode: '{{ item.2 }}'
+#    remote_src: yes
+#  with_together:
+#    - [ 
+#        '/u01/files/add-machine.py',
+#        '/u01/files/add-server.py',
+#       '/u01/files/commonfuncs.py' 
+#      ]
+#    - [ 
+#        '{{NM_DIR}}', 
+#        '{{NM_DIR}}',
+#        '{{NM_DIR}}'
+#      ]
+#    - [ 
+#        'u+rwx,g+rwx,o+rwx', 
+#        'u+rwx,g+rwx,o+rwx',
+#        'u+rwx,g+rwx,o+rwx'
+#      ]
+      
+#- name: Generate commonfuncs.py
+#  template:
+#    src=commonfuncs.j2
+#    dest={{NM_DIR}}/commonfuncs.py
 
-- name: Generate commonfuncs.py
-  template:
-    src=commonfuncs.j2
-    dest={{NM_DIR}}/commonfuncs.py
+#- name: Generate add-machine.py
+#  template:
+#    src=add-machine.j2
+#    dest={{NM_DIR}}/add-machine.py
 
-- name: Generate add-machine.py
-  template:
-    src=add-machine.j2
-    dest={{NM_DIR}}/add-machine.py
-
-- name: Generate add-server.py
-  template:
-    src=add-server.j2
-    dest={{NM_DIR}}/add-server.py
+#- name: Generate add-server.py
+#  template:
+#    src=add-server.j2
+#    dest={{NM_DIR}}/add-server.py
 
 
 - name: Run the Machine Creation WLST Script  
-  shell: wlst.sh -skipWLSModuleScanning {{NM_DIR}}/add-machine.py
+  shell: wlst.sh -skipWLSModuleScanning /u01/files/add-machine.py 
   environment:
-    USER_MEM_ARGS: "-Djava.security.egd=file:/dev/./urandom"
-    PATH: "{{ ansible_env.PATH }}:/u01/oracle/oracle_common/common/bin:/u01/oracle/wlserver/common/bin"
+      USER_MEM_ARGS: '{{USER_MEM_ARGS}}'
+      PATH: "{{ansible_env.PATH }}:{{ORACLE_COMMON_BIN}}:{{WEBLOGIC_COMMON_BIN}}"
+      DOMAIN_NAME: '{{DOMAIN_NAME}}'
+      ADMIN_NAME: '{{ADMIN_NAME}}'
+      ADMIN_PORT: '{{ADMIN_PORT}}'
+      ADMIN_PASSWORD: '{{ADMIN_PASSWORD}}'
+      CLUSTER_NAME: '{{CLUSTER_NAME}}'
+      DOMAIN_PATH: '{{DOMAIN_PATH}}'
+      PRODUCTION_MODE: '{{PRODUCTION_MODE}}'
+      ADMIN_HOST: '{{AdminServer}}'
+      NM_NAME: '{{NM_NAME}}'
+      NM_HOST: '{{NM_HOST}}'
+      NM_PORT: '{{NM_PORT}}'
+      MS_PORT: '{{MS_PORT}}'
+      commonfuncs_py: '{{commonfuncs_py}}'
   register: Machine_Creation_WLST_Script
 
+
+- name: print Machine Creation WLST Script
+  debug: msg={{Machine_Creation_WLST_Script}}
+
 - name: Run the Server Creation WLST Script  
-  shell: wlst.sh -skipWLSModuleScanning {{NM_DIR}}/add-server.py
+  shell: wlst.sh -skipWLSModuleScanning /u01/files/add-server.py 
   environment:
-    USER_MEM_ARGS: "-Djava.security.egd=file:/dev/./urandom"
-    PATH: "{{ ansible_env.PATH }}:/u01/oracle/oracle_common/common/bin:/u01/oracle/wlserver/common/bin"
+      USER_MEM_ARGS: '{{USER_MEM_ARGS}}'
+      PATH: "{{ansible_env.PATH }}:{{ORACLE_COMMON_BIN}}:{{WEBLOGIC_COMMON_BIN}}"
+      DOMAIN_NAME: '{{DOMAIN_NAME}}'
+      ADMIN_NAME: '{{ADMIN_NAME}}'
+      ADMIN_PORT: '{{ADMIN_PORT}}'
+      ADMIN_PASSWORD: '{{ADMIN_PASSWORD}}'
+      CLUSTER_NAME: '{{CLUSTER_NAME}}'
+      DOMAIN_PATH: '{{DOMAIN_PATH}}'
+      PRODUCTION_MODE: '{{PRODUCTION_MODE}}'
+      ADMIN_HOST: '{{AdminServer}}'
+      NM_NAME: '{{NM_NAME}}'
+      NM_HOST: '{{NM_HOST}}'
+      NM_PORT: '{{NM_PORT}}'
+      MS_PORT: '{{MS_PORT}}'
+      commonfuncs_py: '{{commonfuncs_py}}'
   register: Server_Creation_WLST_Script
+
+- name: print Server_Creation_WLST_Script
+  debug: msg={{Server_Creation_WLST_Script}}
 
 

@@ -15,7 +15,7 @@ puts ""
 
 require 'pp'
 
-hosts = YAML.load_file('../Inventory/hosts.yml')
+hosts = YAML.load_file('../Inventory/hosts.3.yml')
 groups = YAML.load_file('../Inventory/groups.yml')
 
 ga = Hash.new {|h,k| h[k]=[]}

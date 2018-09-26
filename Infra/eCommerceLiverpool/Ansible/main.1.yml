@@ -9,7 +9,7 @@
 
   - role: oracle_weblogic_12_2_1_3
     when: inventory_hostname in groups['AdminServers']
-     
+    
   - role: weblogic_domain_creation
     when: inventory_hostname in groups['AdminServers']  
 
