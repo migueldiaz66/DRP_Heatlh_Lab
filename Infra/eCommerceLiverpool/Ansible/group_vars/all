@@ -27,3 +27,4 @@ DOMAINSFILE_STR: DomainsFile={{NM_DIR}}/nodemanager.domains
 NODEMGRHOME_STR: NodeManagerHome={{NM_DIR}}
 LOGFILE_STR: LogFile={{NM_DIR}}/nodemanager.log
 NODEMGR_HOME_STR: NODEMGR_HOME="{{NM_DIR}}"
+USER_MEM_ARGS: -Xms128m -Xmx256m

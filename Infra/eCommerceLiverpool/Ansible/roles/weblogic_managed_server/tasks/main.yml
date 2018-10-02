@@ -27,6 +27,8 @@
       - 'LOGFILE_STR: LogFile={{NM_DIR}}/nodemanager.log'
       - 'NODEMGR_HOME_STR: NODEMGR_HOME="{{NM_DIR}}'
       - 'commonfuncs_py:{{commonfuncs_py}}'
+      - 'USER_MEM_ARGS: {{USER_MEM_ARGS}}'
+      
 
 
 - name: 'Validate if AdminServer is up'
@@ -110,7 +112,7 @@
 - name: Run the Machine Creation WLST Script  
   shell: wlst.sh -skipWLSModuleScanning /u01/files/add-machine.py 
   environment:
-      USER_MEM_ARGS: '{{USER_MEM_ARGS}}'
+      USER_MEM_ARGS: '-Djava.security.egd=file:/dev/./urandom'
       PATH: "{{ansible_env.PATH }}:{{ORACLE_COMMON_BIN}}:{{WEBLOGIC_COMMON_BIN}}"
       DOMAIN_NAME: '{{DOMAIN_NAME}}'
       ADMIN_NAME: '{{ADMIN_NAME}}'
@@ -134,7 +136,7 @@
 - name: Run the Server Creation WLST Script  
   shell: wlst.sh -skipWLSModuleScanning /u01/files/add-server.py 
   environment:
-      USER_MEM_ARGS: '{{USER_MEM_ARGS}}'
+      USER_MEM_ARGS: '-Djava.security.egd=file:/dev/./urandom'
       PATH: "{{ansible_env.PATH }}:{{ORACLE_COMMON_BIN}}:{{WEBLOGIC_COMMON_BIN}}"
       DOMAIN_NAME: '{{DOMAIN_NAME}}'
       ADMIN_NAME: '{{ADMIN_NAME}}'

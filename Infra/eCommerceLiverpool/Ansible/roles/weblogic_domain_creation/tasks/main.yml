@@ -39,7 +39,7 @@
   args:
     chdir: /u01
   environment:
-    USER_MEM_ARGS: '"{{USER_MEM_ARGS}}"'
+    USER_MEM_ARGS: '-Djava.security.egd=file:/dev/./urandom'
     PATH: "{{ansible_env.PATH }}:{{ORACLE_COMMON_BIN}}:{{WEBLOGIC_COMMON_BIN}}"
     DOMAIN_NAME: '{{DOMAIN_NAME}}'
     ADMIN_NAME: '{{ADMIN_NAME}}'

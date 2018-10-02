@@ -1,5 +1,5 @@
-- name: Store01-eCommerce-liverpool-Prd
-  ip: 192.168.1.101
+- name: AdminServer-eCommerce-liverpool-Prd
+  ip: 192.168.1.100
   synced_folders:
     - src: ../SyncFolder/Prd/u01/
       dest: /u01/
@@ -8,3 +8,25 @@
         owner: oracle
         group: oracle
         mount_options: ['dmode=0777', 'fmode=0777']
+  ansible_inventory:
+    groups: 
+      belongs_to: ["AdminServers-Prd"]
+      children: ["AdminServers"]
+      vars: []
+        
+- name: AdminServer-eCommerce-liverpool-Drp
+  ip: 192.168.2.100
+  synced_folders:
+    - src: ../SyncFolder/Drp/u01/
+      dest: /u01/
+      options:
+        create: true
+        owner: oracle
+        group: oracle
+        mount_options: ['dmode=0777', 'fmode=0777']
+  ansible_inventory:
+    groups: 
+      belongs_to: ["AdminServers-Drp"]
+      children: ["AdminServers"]
+      vars: []
+        
