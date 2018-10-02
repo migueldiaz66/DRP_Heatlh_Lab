@@ -5,16 +5,17 @@
   roles:
 
   - role: test 
- # - role: common
+ 
+  - role: common
 
- # - role: oracle_server_jdk8
+  - role: oracle_server_jdk8
 
- # - role: oracle_weblogic_12_2_1_3
- #   when: inventory_hostname in groups['AdminServers']
-    
- # - role: weblogic_domain_creation
- #   when: inventory_hostname in groups['AdminServers']  
+  - role: oracle_weblogic_12_2_1_3
+    when: inventory_hostname in groups['AdminServers']
+   
+  - role: weblogic_domain_creation
+    when: inventory_hostname in groups['AdminServers']  
 
- # - role: weblogic_managed_server
- #   when: inventory_hostname in groups['Stores']  
+  - role: weblogic_managed_server
+    when: inventory_hostname in groups['Stores']  
 
