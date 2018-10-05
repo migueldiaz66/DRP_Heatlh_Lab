@@ -1,0 +1,93 @@
+---
+- hosts: AdminServers
+  gather_facts: true
+
+  tasks:
+
+    - name: "Verify weblogic servers health"
+      shell: wlst.sh -skipWLSModuleScanning /u01/files/GetServersHealth.py
+      environment:
+        USER_MEM_ARGS: -Xms32m -Xmx64m
+        PATH:                  '{{ansible_env.PATH }}:/u01/oracle/oracle_common/common/bin:/u01/oracle/wlserver/common/bin'
+        commonfuncs_py:        /u01/files/commonfuncs.py
+        ADMIN_NAME:            AdminServer
+        ADMIN_PORT:            7001
+        ADMIN_PASSWORD:        Password1@
+        ADMIN_HOST:            '{{inventory_hostname}}'
+      register: weblogic_servers_health_res
+      ignore_errors: yes
+
+    - debug: 
+       var: weblogic_servers_health_res
+
+    - set_fact: 
+        servers_state: "{{weblogic_servers_health_res.stdout_lines | select('match','(Current state of)') | list }}"
+
+    - debug: 
+       msg: "{{servers_state}}"
+
+    - set_fact: servers_name="{{ servers_name|default([])  + [ item.split('\"')[1] ] | list}}"
+      with_items: "{{servers_state}}"
+
+    - debug: 
+       msg: "{{servers_name}}"
+
+    - set_fact: servers_status="{{ servers_status|default([])  + [ item.split('\"')[2].split(':')[1].strip() ] | list}}"
+      with_items: "{{servers_state}}"
+
+    - debug: 
+       msg: "{{servers_status}}"
+
+    - name: set fact
+      set_fact: server_item="{{ item }}"
+      with_together: 
+       - "{{servers_name}}"
+       - "{{servers_status}}"
+      register: server_item_results
+
+    - debug: 
+       msg: "{{server_item_results}}"
+
+    - name: make a list
+      set_fact: server_list="{{ server_item_results.results | map(attribute='ansible_facts.server_item') | list }}"
+
+    - debug: var=server_list
+
+    - name: "Perare the input file for mongo update prd"
+      register: create_mongo_input_file_prd_stdout
+      template:
+        src: verify_weblogic_servers_health.j2
+        dest: ../work/mongo_insert_verify_weblogic_servers_health_prd.txt
+      delegate_to: '127.0.0.1'
+      when: inventory_hostname in groups['AdminServers-Prd']
+
+    - name: "Insert into mongo prd"
+      shell: 'mongo localhost:27017/Liv_Ominchannel_DRP_Health_Monitor  ../work/mongo_insert_verify_weblogic_servers_health_prd.txt'
+      register: mongo_insert_prd_stdout
+      delegate_to: localhost
+      when: inventory_hostname in groups['AdminServers-Prd']
+   
+    - debug: var=mongo_insert_prd_stdout
+      when: inventory_hostname in groups['AdminServers-Prd']
+
+#----------------------------------------------------------
+
+    - name: "Perare the input file for mongo update drp"
+      register: create_mongo_input_file_drp_stdout
+      template:
+        src: verify_weblogic_servers_health.j2
+        dest: ../work/mongo_insert_verify_weblogic_servers_health_drp.txt
+      delegate_to: '127.0.0.1'
+      when: inventory_hostname in groups['AdminServers-Drp']
+
+    - name: "Insert into mongo prd"
+      shell: 'mongo localhost:27017/Liv_Ominchannel_DRP_Health_Monitor  ../work/mongo_insert_verify_weblogic_servers_health_drp.txt'
+      register: mongo_insert_drp_stdout
+      delegate_to: localhost
+      when: inventory_hostname in groups['AdminServers-Drp']
+   
+    - debug: var=mongo_insert_drp_stdout
+      when: inventory_hostname in groups['AdminServers-Drp']
+
+
+

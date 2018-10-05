@@ -3,7 +3,7 @@
     - AdminServer-eCommerce-liverpool-Prd
 - name: "AdminServers-Drp"
   elements:
-    - AdminServer-eCommerce-liverpool-Drd
+    - AdminServer-eCommerce-liverpool-Drp
 - name: "Stores-Prd"
   elements:
     - Store01-eCommerce-liverpool-Prd

@@ -49,6 +49,8 @@ puts "---------------------------------------------------"
 # "Global variables"  initialization block
 i = 1
 ansibleGroupsHash = Hash.new {|h,k| h[k]=[]}
+ansibleGroupsHash1 = Hash.new {|h,k| h[k]=[]}
+ansibleGroupsHash3 = Hash.new {|h,k| h[k]=[]}
 
 # Read configuration file and pull the hosts and goups items 
 # into individual hashes
@@ -63,7 +65,7 @@ puts ""
 
 groups.each do |group|
  len = group["elements"].length
-  for r in 0..len -1
+  for r in 0..len-1
     ansibleGroupsHash[group["name"]] << group["elements"][r]
   end  
 end
@@ -75,6 +77,9 @@ puts '-- provisioner                        --'
 puts '----------------------------------------'
 pp ansibleGroupsHash
 puts '----------------------------------------'
+
+# work arroud to overcome a posible bug in provisioner
+ansibleGroupsHash3 = ansibleGroupsHash1.merge(ansibleGroupsHash)
 
 # Starts the vagrant machines configuration loop
 Vagrant.configure(2) do |config|

@@ -1,0 +1,14 @@
+{% if inventory_hostname in groups['AdminServers-Prd'] %}
+
+    {% for item in server_list %}
+        db.weblogicserverslmonprd.update({_id:"{{item[0]}}"}, { "$set" : {"estado": "{{item[1]}}", "fecha": new Date()}})
+    {% endfor %}
+
+{% elif inventory_hostname in groups['AdminServers-Drp'] %}
+    
+    {% for item in server_list %}
+        db.weblogicserverslmondpr.update({_id:"{{item[0]}}"}, { "$set" : {"estado": "{{item[1]}}", "fecha": new Date()}})
+    {% endfor %}
+
+{% endif %}
+
