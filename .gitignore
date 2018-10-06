@@ -5,4 +5,4 @@
 *.tar.gz
 *.retry
 *.download
-/Infra/eCommerceLiverpool/Ansible/work
+/Infra/eCommerceLiverpool/Ansible/work/
