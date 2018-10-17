@@ -1,0 +1,50 @@
+---
+- hosts: localhost
+  gather_facts: true
+  
+  tasks:
+
+  - name: Run update_weblogic_servers_parents Drp
+    import_role: 
+      name: mongodb_eval_js
+    vars:
+      db_name: 'Liv_Ominchannel_DRP_Health_Monitor'
+      js_code_fragment: 'db.weblogicserverslmondrp.aggregate([{$group:{_id:{$toLower:"$estado"},count:{$sum:1}}}]).pretty();'
+
+  - name: Store Drp result
+    set_fact: drp_result='{{mongodb_eval_js_out}}'
+
+  - debug: var=drp_result
+
+  - name: Run update_weblogic_servers_parents Prd
+    import_role: 
+      name: mongodb_eval_js
+    vars:
+      db_name: 'Liv_Ominchannel_DRP_Health_Monitor'
+      js_code_fragment: 'db.weblogicserverslmonprd.aggregate([{$group:{"_id":{$toLower:"$estado"},count:{$sum:1}}}]).pretty();'
+
+  - name: Store Prd result
+    set_fact: prd_result="{{mongodb_eval_js_out | to_yaml}}"
+
+  - debug: var=prd_result
+
+  #-----------------------------------------
+
+  - name: Store Drp result
+    set_fact: x='db.weblogiclmondrp.update({_id:'Servers'}, {"$set":{"estado":"SHUTDOWN","fecha":new Date()}} )'
+
+  - debug: var=x 
+
+  - name: Run update_weblogic_servers_parents Prd
+    import_role: 
+      name: mongodb_eval_js
+    vars:
+      db_name: 'Liv_Ominchannel_DRP_Health_Monitor'
+      js_code_fragment: 'db.weblogiclmondrp.update({_id:"Servers"},{"$set":{"estado":{{mongodb_eval_js_out | replace(\"\"\", \"\")}},"fecha":new Date()}})'
+  
+
+      #db.weblogiclmondrp.update({_id:'Servers'}, { "$set" : {"estado": "SHUTDOWN", "fecha": new Date()}} )
+
+
+
+

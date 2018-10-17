@@ -1,0 +1,9 @@
+- name: Run --eval mongo
+  shell: "mongo   {{db_name}} --quiet --eval '{{js_code_fragment}}'"
+  register: mongo_eval_js_stdout
+
+- debug: msg='{{mongo_eval_js_stdout}}' 
+      
+- name: Store result in a fact
+  set_fact: mongodb_eval_js_out='{{mongo_eval_js_stdout.stdout_lines}}'
+

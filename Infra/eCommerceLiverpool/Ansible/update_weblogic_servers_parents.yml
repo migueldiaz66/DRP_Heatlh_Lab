@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  gather_facts: true
+  
+  tasks:
+
+  - name: Call resp api
+    uri: 
+      url: http://localhost:9001/weblogicserverslmondrp/updateparents
+      method: POST
+      status_code: 200
+      
+

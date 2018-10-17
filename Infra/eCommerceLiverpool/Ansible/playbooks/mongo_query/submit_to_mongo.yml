@@ -1,0 +1,6 @@
+    - name: Test
+      shell: echo {{mongo_script}}
+      register: test_out
+
+    - name: Debug Test
+      degug: msg= "{{test_out}}"
