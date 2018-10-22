@@ -6,13 +6,14 @@
 
   - name: Call resp api
     uri: 
-      url: http://localhost:9001/weblogicserverslmondrp/updateparents
+      url: http://localhost:9001/ecommercelmondrp/updateparents
+      method: POST
+      status_code: 200
+
+  - name: Call resp api
+    uri: 
+      url: http://localhost:9001/ecommercelmonprd/updateparents
       method: POST
       status_code: 200
       
-  - name: Call resp api
-    uri: 
-      url: http://localhost:9001/weblogicserverslmonprd/updateparents
-      method: POST
-      status_code: 200
 
